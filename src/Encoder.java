@@ -11,7 +11,7 @@ public class Encoder {
     public static void encode(Path inputPath, Path outputPath, int key) {
         try {
             String string = Files.readString(inputPath);
-            String encodedText = replaceChars(string, key);
+            String encodedText = replaceLetters(string, key);
             Files.writeString(outputPath, encodedText);
         } catch (IOException e) {
             e.printStackTrace();
@@ -35,7 +35,7 @@ public class Encoder {
         int key = 0;
         String result = "";
         for (int i = 1; i < Language.ALPHABET_EN_BIG.size(); i++) {
-            String bruteForcedText = replaceChars(textToDecode, -i);
+            String bruteForcedText = replaceLetters(textToDecode, -i);
             encodedTextHistogram = getHistogram(bruteForcedText);
             normalizeHistogram(encodedTextHistogram);
             if (calculateDelta(referenceHistogram,encodedTextHistogram) < delta) {
@@ -48,30 +48,41 @@ public class Encoder {
         Files.writeString(outputPath, result);
     }
 
-    private static String replaceChars(String text, int key) {
+    private static String replaceLetters(String text, int key) {
         char[] stringToChars = text.toCharArray();
         for (int i = 0; i < stringToChars.length; i++) {
-            if (Character.isAlphabetic(stringToChars[i])) {
-                if (Language.isEnglishLetter(stringToChars[i])) {
-                    if (Character.isUpperCase(stringToChars[i])) {
-                        int index = Language.ALPHABET_EN_BIG.indexOf(stringToChars[i]);
-                        stringToChars[i] = getEncryptedAlphabet(Language.ALPHABET_EN_BIG, key).get(index);
-                    } else {
-                        int index = Language.ALPHABET_EN_SMALL.indexOf(stringToChars[i]);
-                        stringToChars[i] = getEncryptedAlphabet(Language.ALPHABET_EN_SMALL, key).get(index);
-                    }
-                } else if (Language.isRussianLetter(stringToChars[i])) {
-                    if (Character.isUpperCase(stringToChars[i])) {
-                        int index = Language.ALPHABET_RU_BIG.indexOf(stringToChars[i]);
-                        stringToChars[i] = getEncryptedAlphabet(Language.ALPHABET_RU_BIG, key).get(index);
-                    } else {
-                        int index = Language.ALPHABET_RU_SMALL.indexOf(stringToChars[i]);
-                        stringToChars[i] = getEncryptedAlphabet(Language.ALPHABET_RU_SMALL, key).get(index);
-                    }
+            char letter = stringToChars[i];
+            if (Character.isAlphabetic(letter)) {
+                if (Language.isEnglishLetter(letter)) {
+                    stringToChars[i] = replaceEnglishLetter(letter, key);
+                } else if (Language.isRussianLetter(letter)) {
+                    stringToChars[i] = replaceRussianLetter(letter, key);
                 }
             }
         }
         return new String(stringToChars);
+    }
+
+    private static char replaceEnglishLetter(char letter, int key) {
+        if (Character.isUpperCase(letter)) {
+            int index = Language.ALPHABET_EN_BIG.indexOf(letter);
+            letter = getEncryptedAlphabet(Language.ALPHABET_EN_BIG, key).get(index);
+        } else {
+            int index = Language.ALPHABET_EN_SMALL.indexOf(letter);
+            letter = getEncryptedAlphabet(Language.ALPHABET_EN_SMALL, key).get(index);
+        }
+        return letter;
+    }
+
+    private static char replaceRussianLetter(char letter, int key) {
+        if (Character.isUpperCase(letter)) {
+            int index = Language.ALPHABET_RU_BIG.indexOf(letter);
+            letter = getEncryptedAlphabet(Language.ALPHABET_RU_BIG, key).get(index);
+        } else {
+            int index = Language.ALPHABET_RU_SMALL.indexOf(letter);
+            letter = getEncryptedAlphabet(Language.ALPHABET_RU_SMALL, key).get(index);
+        }
+        return letter;
     }
 
     private static List<Character> getEncryptedAlphabet(List<Character> alphabet, int key) {

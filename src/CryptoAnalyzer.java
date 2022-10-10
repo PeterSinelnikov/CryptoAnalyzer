@@ -1,19 +1,30 @@
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class CryptoAnalyzer {
+    private static final String ENCODE = "encode";
+    private static final String DECODE = "decode";
+    private static final String BRUTE_FORCE = "bruteForce";
+
     public static void main(String[] args) throws IOException {
+        String operation = args[0];
         Path input = Path.of(args[1]);
-        if (args[0].equals("encode")) {
-            int key = Integer.parseInt(args[2]);
+        String key = args[2];
+        if (!Files.isRegularFile(input)) {
+            throw new IllegalArgumentException("provide valid input file path");
+        }
+
+        if (ENCODE.equalsIgnoreCase(operation)) {
+            int encodingKey = Integer.parseInt(key);
             Path output = OutputPath.getPath(input,"encoded");
-            Encoder.encode(input,output,key);
-        } else if (args[0].equals("decode")) {
-            int key = Integer.parseInt(args[2]);
+            Encoder.encode(input,output,encodingKey);
+        } else if (DECODE.equalsIgnoreCase(operation)) {
+            int decodingKey = Integer.parseInt(key);
             Path output = OutputPath.getPath(input,"decoded");
-            Encoder.decode(input,output,key);
-        } else if (args[0].equals("bruteForce")) {
-            Path referenceFile = Path.of(args[2]);
+            Encoder.decode(input,output,decodingKey);
+        } else if (BRUTE_FORCE.equalsIgnoreCase(operation)) {
+            Path referenceFile = Path.of(key);
             Encoder.bruteForce(input,referenceFile);
         } else {
             throw new IllegalArgumentException("Provide following arguments: operation filePath key/referencePath");

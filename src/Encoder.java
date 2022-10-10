@@ -1,3 +1,4 @@
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,11 +25,12 @@ public class Encoder {
 
     public static void bruteForce(Path inputPath, Path referenceFile) throws IOException {
         String referenceString = Files.readString(referenceFile);
-        Integer[] referenceHistogram = getHistogram(referenceString);
+        List<Character> alphabet = Language.getLanguageAlphabet(referenceString);
+        Integer[] referenceHistogram = getHistogram(referenceString,alphabet);
         normalizeHistogram(referenceHistogram);
 
         String textToDecode = Files.readString(inputPath);
-        Integer[] encodedTextHistogram = getHistogram(textToDecode);
+        Integer[] encodedTextHistogram = getHistogram(textToDecode, alphabet);
         normalizeHistogram(encodedTextHistogram);
 
         int minDelta = Integer.MAX_VALUE;
@@ -36,7 +38,7 @@ public class Encoder {
         String result = "";
         for (int i = 1; i < Language.ALPHABET_EN_BIG.size(); i++) {
             String bruteForcedText = replaceLetters(textToDecode, -i);
-            encodedTextHistogram = getHistogram(bruteForcedText);
+            encodedTextHistogram = getHistogram(bruteForcedText,alphabet);
             normalizeHistogram(encodedTextHistogram);
             int delta = calculateDelta(referenceHistogram,encodedTextHistogram);
             if (delta < minDelta) {
@@ -81,15 +83,15 @@ public class Encoder {
         return copy;
     }
 
-    private static Integer[] getHistogram(String text) {
+    private static Integer[] getHistogram(String text, List<Character> alphabet) {
         char[] chars = text.toCharArray();
-        Integer[] histogram = new Integer[26];
+        int alphabetLength = alphabet.size();
+        Integer[] histogram = new Integer[alphabetLength];
         Arrays.fill(histogram,0);
-
-        for (int i = 0; i < chars.length; i++) {
-            if (Language.isEnglishLetter(chars[i])) {
-                char character = Character.toUpperCase(chars[i]);
-                int letterIndex = Language.ALPHABET_EN_BIG.indexOf(character);
+        for (char letter : chars) {
+            if (alphabet.contains(letter)) {
+                char character = Character.toUpperCase(letter);
+                int letterIndex = alphabet.indexOf(character);
                 histogram[letterIndex]++;
             }
         }

@@ -17,4 +17,15 @@ public class Language {
     public static boolean isRussianLetter(char c) {
         return ALPHABET_RU_SMALL.contains(c) || ALPHABET_RU_BIG.contains(c);
     }
+
+    static List<Character> getLanguageAlphabet(String referenceString) {
+        List<Character> currentLanguage = ALPHABET_EN_BIG;
+        String substring = referenceString.substring(0, 16);
+        for (char c : substring.toCharArray()) {
+            if (isRussianLetter(c)){
+                currentLanguage = ALPHABET_RU_BIG;
+            }
+        }
+        return currentLanguage;
+    }
 }

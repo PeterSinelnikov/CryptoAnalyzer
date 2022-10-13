@@ -27,7 +27,7 @@ public class CryptoAnalyzer {
             Encoder.decode(input,output,decodingKey);
         } else if (BRUTE_FORCE.equalsIgnoreCase(operation)) {
             Path referenceFile = Path.of(key);
-            BruteForce.bruteForce(input,referenceFile);
+            StatisticAnalyzer.bruteForce(input,referenceFile);
         } else {
             throw new IllegalArgumentException("Provide following arguments: operation filePath key/referencePath");
         }

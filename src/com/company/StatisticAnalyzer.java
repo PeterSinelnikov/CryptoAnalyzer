@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-public class BruteForce {
+public class StatisticAnalyzer {
 
     public static void bruteForce(Path inputPath, Path referenceFile) throws IOException {
         String referenceString = Files.readString(referenceFile);
